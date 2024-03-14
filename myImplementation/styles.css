@@ -1,0 +1,14 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.whiteKey {
+    stroke: #555;
+    fill: #FFFFF7
+}
+
+.blackKey {
+    stroke: #979797;
+    fill: #4b4b4b
+}
