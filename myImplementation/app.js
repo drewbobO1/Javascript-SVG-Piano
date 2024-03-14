@@ -1,5 +1,3 @@
-let numOctaves = 4;
-const octWidthPx = 560;
 const whiteKeyWidthPx = 80;
 const whiteKeyHeightPx = 400;
 const blackKeyWidthPx = 40;
@@ -7,64 +5,37 @@ const blackKeyHeightPx = 260;
 const initBlackKeyOffsetPx = 60;
 
 const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
-const displayedNotesRange = ["C3", "B6"];
+const sharpNotes = ["C", "D", "F", "G", "A"];
+const flatNotes = ["D", "E", "G", "A", "B"];
 
-
-const kbSVG = `<svg 
-width="100%" 
-viewBox="0 0 ${ numOctaves * octWidthPx} 400"
-xmlns="http://www.w3.org/2000/svg"
-xmlns:xlink="http://www.w3.org/1999/xlink"
->
-    <g id="octGroupContainer">
-    </g>
-</svg>`;
+const displayedNotesRange = ["G3", "A7"];
 
 const kbContainer = document.getElementById("keyboardContainer");
 
 const app = {
     setupPiano() 
     {
-        // Add main SVG to keyboard container div
-        kbContainer.innerHTML = kbSVG;
-        const octGroupContainer = document.getElementById("octGroupContainer");
+        const allNaturalNotes = this.getAllNaturalNoteNames(displayedNotesRange);
+        const fullKBWidth = allNaturalNotes.length * whiteKeyWidthPx;
 
-        // Create octave groups
-        for (let i = 0; i < numOctaves; i++) {
-            const octave = this.createOctave(i);
+        const kbSVG = this.createMainSVG(fullKBWidth, whiteKeyHeightPx);
+        kbContainer.appendChild(kbSVG);
 
-            // Add white keys to oct group
-            for (let j = 0; j < 7; j++)
-            {
-                const whiteKey = this.createKey({ className: "whiteKey", width: whiteKeyWidthPx, height: whiteKeyHeightPx });
-                whiteKey.setAttribute("x", (j * whiteKeyWidthPx));
-                
-                octave.appendChild(whiteKey);
-            }
+        // Add white keys
+        for (let i = 0; i < allNaturalNotes.length; i++)
+        {
+            const whiteKey = this.createKey({ className: "whiteKey", width: whiteKeyWidthPx, height: whiteKeyHeightPx });
+            whiteKey.setAttribute("x", i * whiteKeyWidthPx);
+            whiteKey.setAttribute("dataNoteName", allNaturalNotes[i]);
 
-            // Add black keys to oct group
-            for (let j = 0; j < 6; j++)
-            {
-                const blackKey = this.createKey({ className: "blackKey", width: blackKeyWidthPx, height: blackKeyHeightPx });
-                
-                if (j === 0)
-                {
-                    blackKey.setAttribute("x", initBlackKeyOffsetPx);
-                }
-                else if (j === 2)
-                {
-                    continue;
-                }
-                else
-                {
-                    blackKey.setAttribute("x", (initBlackKeyOffsetPx + (j * whiteKeyWidthPx)));
-                }
-
-                octave.appendChild(blackKey);
-            }
-
-            octGroupContainer.appendChild(octave);
+            kbSVG.appendChild(whiteKey);
         }
+
+        // Add black keys
+        allNaturalNotes.forEach((naturalNote, index, array) => {
+            const blackKey = this.createKey({ className: "blackKey", width: blackKeyWidthPx, height: blackKeyHeightPx });
+            
+        })
     },
 
     createOctave(octQty)
@@ -96,33 +67,41 @@ const app = {
         const firstNotePos = naturalNotes.indexOf(firstNoteName);
         const lastNotePos = naturalNotes.indexOf(lastNoteName);
 
-        const allNaturalNotes = [];
+        const allNaturalNotesInFunc = [];
         for (let octNum = firstOctNum; octNum <= lastOctNum; octNum++)
         {
             if (octNum === firstOctNum)
             {
-                const firstOct = naturalNotes.slice(firstNotePos).map((noteName) => {
-                    return noteName + octNum;
+                naturalNotes.slice(firstNotePos).forEach((noteName) => {
+                    allNaturalNotesInFunc.push(noteName + octNum);
                 });
-                allNaturalNotes.push(firstOct);
             }
             else if (octNum === lastOctNum)
             {
-                const lastOct = naturalNotes.slice(0, lastNotePos + 1).map((noteName) => {
-                    return noteName + octNum;
+               naturalNotes.slice(0, lastNotePos + 1).forEach((noteName) => {
+                    allNaturalNotesInFunc.push(noteName + octNum);
                 });
-                allNaturalNotes.push(lastOct);
             }
             else
             {
-                const middleOct = naturalNotes.map((noteName) => {
-                    return noteName + octNum;
+                naturalNotes.forEach((noteName) => {
+                    allNaturalNotesInFunc.push(noteName + octNum);
                 });
-                allNaturalNotes.push(middleOct);
             }
         }
-        return allNaturalNotes;
+        return allNaturalNotesInFunc;
     },
+
+    createMainSVG(kbWidth, kbHeight)
+    {
+        const kbSVG = utils.createSVGElement("svg");
+        kbSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+        kbSVG.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
+        kbSVG.setAttribute("width", "100%");
+        kbSVG.setAttribute("viewBox", `0 0 ${kbWidth} ${kbHeight}`);
+
+        return kbSVG;
+    }
 
 
 }
@@ -136,7 +115,7 @@ const utils = {
 }
 
 app.setupPiano();
-app.getAllNaturalNoteNames(displayedNotesRange);
+console.log(app.getAllNaturalNoteNames(displayedNotesRange));
 
 
 
