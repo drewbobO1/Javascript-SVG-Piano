@@ -1,14 +1,13 @@
 const whiteKeyWidthPx = 80;
 const whiteKeyHeightPx = 400;
-const blackKeyWidthPx = 40;
+const blackKeyWidthPx = whiteKeyWidthPx / 2;
 const blackKeyHeightPx = 260;
-const initBlackKeyOffsetPx = 60;
 
 const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
 const sharpNotes = ["C", "D", "F", "G", "A"];
 const flatNotes = ["D", "E", "G", "A", "B"];
 
-const displayedNotesRange = ["G3", "A7"];
+const displayedNotesRange = ["A3", "B7"];
 
 const kbContainer = document.getElementById("keyboardContainer");
 
@@ -19,39 +18,94 @@ const app = {
         const fullKBWidth = allNaturalNotes.length * whiteKeyWidthPx;
 
         const kbSVG = this.createMainSVG(fullKBWidth, whiteKeyHeightPx);
-        kbContainer.appendChild(kbSVG);
 
+        let whiteKeyPosX = 0;
+        
         // Add white keys
-        for (let i = 0; i < allNaturalNotes.length; i++)
-        {
+        allNaturalNotes.forEach((noteName) => {
+            const whiteKeyGroup = utils.createSVGElement("g");
             const whiteKey = this.createKey({ className: "whiteKey", width: whiteKeyWidthPx, height: whiteKeyHeightPx });
-            whiteKey.setAttribute("x", i * whiteKeyWidthPx);
-            whiteKey.setAttribute("dataNoteName", allNaturalNotes[i]);
+            const text = utils.createSVGElement("text");
 
-            kbSVG.appendChild(whiteKey);
-        }
+            utils.addTextContent(text, noteName);
+            utils.setAttributes(whiteKeyGroup, {"width": whiteKeyWidthPx});
+            utils.setAttributes(text, {
+                "x": (whiteKeyPosX + (whiteKeyWidthPx / 2)),
+                "y": 380,
+                "text-anchor": "middle"
+            });
+            utils.setAttributes(whiteKey, {
+                "x": whiteKeyPosX,
+                "dataNoteName": noteName
+            })
+
+            text.classList.add("whiteKeyText");
+            whiteKeyGroup.appendChild(whiteKey);
+            whiteKeyGroup.appendChild(text);
+
+            kbSVG.appendChild(whiteKeyGroup);
+
+            whiteKeyPosX += whiteKeyWidthPx;
+        });
 
         // Add black keys
+        let blackKeyPosX = 60;
+
         allNaturalNotes.forEach((naturalNote, index, array) => {
             const blackKey = this.createKey({ className: "blackKey", width: blackKeyWidthPx, height: blackKeyHeightPx });
-            
-        })
+            utils.setAttributes(blackKey, {
+                "x": blackKeyPosX
+            });
+
+            for (let i = 0; i < sharpNotes.length; i++)
+            {
+                let sharpNoteName = sharpNotes[i];
+                let flatNoteName = flatNotes[i];
+
+                if (sharpNoteName === naturalNote[0])
+                {
+                    utils.setAttributes(blackKey, {
+                        "dataSharpName": `${sharpNoteName}#${naturalNote[1]}`,
+                        "dataFlatName": `${flatNoteName}b${naturalNote[1]}`
+                    });
+
+                    // Add double spacing between D# and A#
+                    if (sharpNoteName === "D" || sharpNoteName === "A")
+                    {
+                        blackKeyPosX += (whiteKeyWidthPx * 2);
+                    }
+                    else
+                    {
+                        blackKeyPosX += whiteKeyWidthPx;
+                    }
+                    if (index !== allNaturalNotes.length - 1)
+                    {
+                        kbSVG.appendChild(blackKey);
+                    }
+                }
+            }
+        });
+
+        // Add main SVG to container in HTML
+        kbContainer.appendChild(kbSVG);
     },
 
-    createOctave(octQty)
-    {
-        const octave = utils.createSVGElement("g");
-        octave.classList.add("octave");
-        octave.setAttribute("transform", `translate(${octQty * octWidthPx}, 0)`);
-        return octave;
-    },
+    // createOctave(octQty)
+    // {
+    //     const octave = utils.createSVGElement("g");
+    //     octave.classList.add("octave");
+    //     octave.setAttribute("transform", `translate(${octQty * octWidthPx}, 0)`);
+    //     return octave;
+    // },
 
     createKey({ className, width, height })
     {
         const key = utils.createSVGElement("rect");
         key.classList.add(className);
-        key.setAttribute("width", width);
-        key.setAttribute("height", height);
+        utils.setAttributes(key, {
+            "width": width,
+            "height": height
+        })
         return key;
     },
 
@@ -95,15 +149,16 @@ const app = {
     createMainSVG(kbWidth, kbHeight)
     {
         const kbSVG = utils.createSVGElement("svg");
-        kbSVG.setAttribute("xmlns", "http://www.w3.org/2000/svg");
-        kbSVG.setAttribute("xmlns:xlink", "http://www.w3.org/1999/xlink");
-        kbSVG.setAttribute("width", "100%");
-        kbSVG.setAttribute("viewBox", `0 0 ${kbWidth} ${kbHeight}`);
+        utils.setAttributes(kbSVG, {
+            "width": "100%",
+            "xmlns": "http://www.w3.org/2000/svg",
+            "xmlns:xlink": "http://www.w3.org/1999/xlink",
+            "width": "100%",
+            "viewBox": `0 0 ${kbWidth} ${kbHeight}`
+        });
 
         return kbSVG;
     }
-
-
 }
 
 const utils = {
@@ -111,6 +166,19 @@ const utils = {
     {
         const element = document.createElementNS("http://www.w3.org/2000/svg", el);
         return element;
+    },
+
+    setAttributes(el, attrs)
+    {
+        for (let key in attrs)
+        {
+            el.setAttribute(key, attrs[key]);
+        }
+    },
+
+    addTextContent(el, content)
+    {
+        el.textContent = content;
     }
 }
 
