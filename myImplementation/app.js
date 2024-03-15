@@ -96,8 +96,8 @@ const app = {
                         "y": 240
                     })
 
-                    utils.addTextContent(sharpNameText, `${sharpNoteName}♯${eachNaturalNote[1]}`);
-                    utils.addTextContent(flatNameText, `${flatNoteName}♭${eachNaturalNote[1]}`);
+                    utils.addTextContent(sharpNameText, `${sharpNoteName}♯`);
+                    utils.addTextContent(flatNameText, `${flatNoteName}♭`);
 
                     flatNameText.classList.add("blackKeyText");
                     sharpNameText.classList.add("blackKeyText");
