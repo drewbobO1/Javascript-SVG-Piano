@@ -7,7 +7,7 @@ const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
 const sharpNotes = ["C", "D", "F", "G", "A"];
 const flatNotes = ["D", "E", "G", "A", "B"];
 
-const displayedNotesRange = ["A3", "B7"];
+const displayedNotesRange = ["B3", "B7"];
 
 const kbContainer = document.getElementById("keyboardContainer");
 
@@ -49,25 +49,58 @@ const app = {
         });
 
         // Add black keys
+        console.log("displayedNotesRange: ", displayedNotesRange[0][0])
         let blackKeyPosX = 60;
+        if (displayedNotesRange[0][0] === "B")
+        {
+            blackKeyPosX = 140;
+        }
+        
+        allNaturalNotes.forEach((eachNaturalNote, index, array) => {
+            if (index === array.length - 1)
+            {
+                return;
+            }
 
-        allNaturalNotes.forEach((naturalNote, index, array) => {
+            const blackKeyGroup = utils.createSVGElement("g");
             const blackKey = this.createKey({ className: "blackKey", width: blackKeyWidthPx, height: blackKeyHeightPx });
-            utils.setAttributes(blackKey, {
-                "x": blackKeyPosX
-            });
+            const flatNameText = utils.createSVGElement("text");
+            const sharpNameText = utils.createSVGElement("text");
+
+            utils.setAttributes(blackKeyGroup, { width: blackKeyWidthPx });
+
 
             for (let i = 0; i < sharpNotes.length; i++)
             {
                 let sharpNoteName = sharpNotes[i];
                 let flatNoteName = flatNotes[i];
 
-                if (sharpNoteName === naturalNote[0])
+                if (sharpNoteName === eachNaturalNote[0])
                 {
+
                     utils.setAttributes(blackKey, {
-                        "dataSharpName": `${sharpNoteName}#${naturalNote[1]}`,
-                        "dataFlatName": `${flatNoteName}b${naturalNote[1]}`
+                        "x": blackKeyPosX,
+                        "dataSharpName": `${sharpNoteName}♯${eachNaturalNote[1]}`,
+                        "dataFlatName": `${flatNoteName}♭${eachNaturalNote[1]}`
                     });
+
+                    utils.setAttributes(sharpNameText, {
+                        "text-anchor": "middle",
+                        "x": blackKeyPosX + (blackKeyWidthPx / 2),
+                        "y": 215
+                    })
+
+                    utils.setAttributes(flatNameText, {
+                        "text-anchor": "middle",
+                        "x": blackKeyPosX + (blackKeyWidthPx / 2),
+                        "y": 240
+                    })
+
+                    utils.addTextContent(sharpNameText, `${sharpNoteName}♯${eachNaturalNote[1]}`);
+                    utils.addTextContent(flatNameText, `${flatNoteName}♭${eachNaturalNote[1]}`);
+
+                    flatNameText.classList.add("blackKeyText");
+                    sharpNameText.classList.add("blackKeyText");
 
                     // Add double spacing between D# and A#
                     if (sharpNoteName === "D" || sharpNoteName === "A")
@@ -78,12 +111,13 @@ const app = {
                     {
                         blackKeyPosX += whiteKeyWidthPx;
                     }
-                    if (index !== allNaturalNotes.length - 1)
-                    {
-                        kbSVG.appendChild(blackKey);
-                    }
+
+                    blackKeyGroup.appendChild(blackKey);
+                    blackKeyGroup.appendChild(flatNameText);
+                    blackKeyGroup.appendChild(sharpNameText);
                 }
             }
+            kbSVG.appendChild(blackKeyGroup);
         });
 
         // Add main SVG to container in HTML

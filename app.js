@@ -6,7 +6,7 @@ const naturalNotes = ["C", "D", "E", "F", "G", "A", "B"];
 const naturalNotesSharps = ["C", "D", "F", "G", "A"];
 const naturalNotesFlats = ["D", "E", "G", "A", "B"];
 
-const range = ["A0", "B6"];
+const range = ["B0", "B6"];
 
 const app = {
     setupPiano() {

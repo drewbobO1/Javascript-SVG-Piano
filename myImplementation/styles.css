@@ -12,3 +12,19 @@
     stroke: #979797;
     fill: #4b4b4b
 }
+
+.whiteKeyText {
+    font-family: Helvetica, sans-serif;
+    font-weight: bold;
+    pointer-events: none;
+    user-select: none;
+}
+
+.blackKeyText {
+    font-family: Helvetica, sans-serif;
+    font-weight: bold;
+    pointer-events: none;
+    user-select: none;
+
+    color: #FFFFF7;
+}
